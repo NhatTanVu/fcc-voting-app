@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en" ng-app="votingApp">
+  <head>
+    <% if (isMyVote == false) { %>
+      <title>All Polls | FCC Voting</title>
+    <% } else { %>
+      <title>My Polls | FCC Voting</title>
+    <% } %>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" 
+      integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <style>
+      body {
+        /*padding-top: 60px;*/
+      }
+      .navbar {
+        border-radius: 4px;
+      }
+      .full-size-item {
+        width: 100%;
+        border-bottom-width: 0;
+      }
+      .full-size-item:last-child {
+        border-bottom-width: 1px;
+      }
+      .description {
+        text-align: center;
+      }
+      li.btn-primary > a {
+        color: #fff !important;
+      }
+      #profile-link {
+        padding-top: 9px;
+        padding-bottom: 9px;
+      }
+      #profile-photo {
+        width: 32px;
+        height: 32px;
+        display: inline-block; 
+        vertical-align: middle; 
+        background-size: 32px 32px;
+      }
+    </style>
+    <base href="<%= process.env.APP_URL %>">
+  </head>
+  <body ng-controller="VotingController as votingCtrl" ng-init="votingCtrl.init(<%= isMyVote %>)">
+    <div class="container">
+      <div class="navbar navbar-default row">
+        <div class="navbar-header"> 
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">FCC Voting</a> 
+        </div>
+        <div class="collapse navbar-collapse nav-form" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+            <% if (isMyVote) { %>
+              <li>
+                  <a href="/">All Polls</a>
+              </li>
+            <% } else { %>
+              <li class="active">
+                  <a href="/">All Polls</a>
+              </li>
+            <% } %>
+            <% if (!userInfo.isAuthenticated) { %>
+              <li class="btn-primary">
+                  <a href="" ng-click="votingCtrl.signInWithGoogle()">Sign in with Google</a>
+              </li>
+            <% } else { %>
+              <% if (isMyVote) { %>
+                <li class="active">
+                  <a href="" ng-click="votingCtrl.showMyPolls()">My Polls</a>
+                </li>
+              <% } else { %>
+                <li>
+                  <a href="" ng-click="votingCtrl.showMyPolls()">My Polls</a>
+                </li>
+              <% } %>
+              <li class="btn-primary">
+                  <a href="" ng-click="votingCtrl.createPoll()">Create Poll</a>
+              </li>
+              <li>
+                  <a id="profile-link" href="" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    <span id="profile-photo" title="<%= userInfo.displayName %>" style="background-image: url(<%= userInfo.photo %>);"></span>
+                    <span class="caret"></span>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li>
+                      <a href="" ng-click="votingCtrl.signOut()">Sign out</a>
+                    </li>
+                  </ul>
+              </li>  
+            <% } %>
+          </ul>
+        </div>
+      </div>
+      <div class="page-header description">
+        <% if (isMyVote == false) { %>
+          <h1>All Polls</h1>
+        <% } else { %>
+          <h1>My Polls</h1>
+        <% } %>
+      </div>
+      <div class="row">
+        <div class="well">
+          <% if (isMyVote == false) { %>
+            <div class="description">
+              <h3>Below are polls hosted by FCC Voting.</h3>
+              <h3>Select a poll to see the results and vote, or sign-in to make a new poll.</h3>
+            </div>
+            <br/>
+          <% } %>
+          <button class="btn btn-default full-size-item" ng-repeat="poll in votingCtrl.polls" ng-click="votingCtrl.viewPoll(poll.pollId)">
+            {{poll.title}}
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-2.2.3.min.js" 
+      integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" 
+      integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js"></script>
+    <script src="js/votingController.js"></script>
+  </body>
+</html>

@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en" ng-app="votingApp">
+  <head>
+    <title><%= pollTitle %> | FCC Voting</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" 
+      integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <style>
+      body {
+        /*padding-top: 60px;*/
+      }
+      .navbar {
+        border-radius: 4px;
+      }
+      .full-size-item {
+        width: 100%;
+        border-bottom-width: 0;
+      }
+      .full-size-item:last-child {
+        border-bottom-width: 1px;
+      }
+      .description {
+        text-align: center;
+      }
+      li.btn-primary > a {
+        color: #fff !important;
+      }
+      #canvas-holder {
+        width: 75%;
+        margin: 0 auto;
+      }
+      .shareit-twitter-colors {
+        background-color: #4099FF;
+        color: white;
+      }
+      .shareit-twitter-colors:hover, .shareit-twitter-colors:focus {
+        color: white;
+        background-color: #337ab7;
+      }
+      #profile-link {
+        padding-top: 9px;
+        padding-bottom: 9px;
+      }
+      #profile-photo {
+        width: 32px;
+        height: 32px;
+        display: inline-block; 
+        vertical-align: middle; 
+        background-size: 32px 32px;
+      }
+    </style>
+    <base href="<%= process.env.APP_URL %>">
+  </head>
+  <body ng-controller="PollDetailsController as pollCtrl" ng-init="pollCtrl.init('<%= pollId %>')">
+    <div class="container">
+      <div class="navbar navbar-default row">
+        <div class="navbar-header"> 
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">FCC Voting</a> 
+        </div>
+        <div class="collapse navbar-collapse nav-form" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+            <li>
+                <a href="/">All Polls</a>
+            </li>    
+            <% if (!userInfo.isAuthenticated) { %>
+              <li class="btn-primary">
+                  <a href="" ng-click="pollCtrl.signInWithGoogle()">Sign in with Google</a>
+              </li>
+            <% } else { %>
+              <li>
+                  <a href="" ng-click="pollCtrl.showMyPolls()">My Polls</a>
+              </li>
+              <li class="btn-primary">
+                  <a href="" ng-click="pollCtrl.createPoll()">Create Poll</a>
+              </li>
+              <li>
+                  <a id="profile-link" href="" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                    <span id="profile-photo" title="<%= userInfo.displayName %>" style="background-image: url(<%= userInfo.photo %>);"></span>
+                    <span class="caret"></span>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li>
+                      <a href="" ng-click="pollCtrl.signOut()">Sign out</a>
+                    </li>
+                  </ul>
+              </li>  
+            <% } %>
+          </ul>
+        </div>
+      </div>
+      <div class="page-header description">
+        <h1><%= pollTitle %></h1>
+      </div>
+      <div class="row well jumbotron">
+        <div class="col-sm-4">
+          <form ng-submit="pollCtrl.submitVote()">
+            <div class="form-group">
+              <div class="row">
+                <div class="col-xs-12">
+                  <div class="form-group">
+                    <label for="votefor">I'd like to vote for...: </label>
+                    <select id="votefor" class="form-control" ng-change="pollCtrl.changeOption()" ng-model="pollCtrl.selectedOptionId">
+                      <option value="" disabled="disabled" selected="selected" hidden="">Choose an option...: </option>
+                      <option ng-repeat="option in pollCtrl.poll.options" value="{{option._id}}_{{$index}}">{{option.name}}</option>
+                      <% if (userInfo.isAuthenticated) { %>
+                        <option value="{{pollCtrl.CUSTOM_OPTION_ID}}">I'd like a custom option</option>
+                      <% } %>
+                    </select> 
+                    <% if (userInfo.isAuthenticated) { %>
+                      <div class="form-group" ng-show="pollCtrl.selectedOptionId == pollCtrl.CUSTOM_OPTION_ID">
+                        <label for="custom-option">Vote with my own option: </label>
+                        <input id="custom-option" type="text" ng-trim="true" ng-model="pollCtrl.customValue">
+                      </div>
+                    <% } %>
+                  </div>
+                </div>
+                <div class="col-xs-12">
+                  <input class="btn btn-primary btn-block" type="submit" value="Submit">
+                </div>
+              </div>
+            </div>
+          </form>
+          <div class="row form-group">
+            <div class="col-xs-12">
+              <a ng-click="pollCtrl.shareOnTwitter()" href="" class="btn btn-block shareit-twitter-colors">
+                Share on Twitter
+              </a>
+            </div>
+           </div>
+           <% if (userInfo.isAuthenticated) { %>
+             <div class="row">
+              <div class="col-xs-12">
+                <a ng-click="pollCtrl.removePoll()" href="" class="btn btn-block btn-danger">
+                  Remove Poll
+                </a>
+              </div>
+             </div>
+           <% } %>
+        </div>
+        <div class="col-sm-8">
+          <div id="canvas-holder">
+            <canvas id="chart-area" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-2.2.3.min.js" 
+      integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" 
+      integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js"></script>
+    <script src="../js/pollDetailsController.js"></script>
+    <script src="../js/Chart.min.js"></script>
+  </body>
+</html>

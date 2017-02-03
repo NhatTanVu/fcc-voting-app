@@ -1,0 +1,18 @@
+{
+  "name": "fcc-voting-app",
+  "version": "1.0.0",
+  "description": "FCC Voting Application",
+  "main": "server.js",
+  "repository": "",
+  "author": "Tan Vu <onchua2006@gmail.com>",
+  "dependencies": {
+    "chart.js": "^2.0.2",
+    "dotenv": "^2.0.0",
+    "ejs": "^2.4.1",
+    "express": "~3.2.4",
+    "express-session": "^1.14.2",
+    "mongoose": "^4.7.7",
+    "passport": "^0.3.2",
+    "passport-google-oauth": "^1.0.0"
+  }
+}
