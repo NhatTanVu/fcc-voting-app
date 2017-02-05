@@ -115,8 +115,8 @@
             </div>
             <br/>
           <% } %>
-          <button class="btn btn-default full-size-item" ng-repeat="poll in votingCtrl.polls" ng-click="votingCtrl.viewPoll(poll.pollId)">
-            {{poll.title}}
+          <button class="btn btn-default full-size-item" ng-repeat="poll in votingCtrl.polls" 
+            ng-click="votingCtrl.viewPoll(poll.pollId)" ng-bind="poll.title">
           </div>
         </div>
       </div>
